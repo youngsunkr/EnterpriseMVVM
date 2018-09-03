@@ -99,6 +99,10 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <ProjectReference Include="..\..\EnterpriseMVVM.Data\EnterpriseMVVM.Data.csproj">
+      <Project>{89d0f528-fbee-4cf5-9855-8a69b31a1a25}</Project>
+      <Name>EnterpriseMVVM.Data</Name>
+    </ProjectReference>
     <ProjectReference Include="..\EnterpriseMVVM.Windows\EnterpriseMVVM.Windows.csproj">
       <Project>{d06c402d-2889-43de-a357-e0378b451763}</Project>
       <Name>EnterpriseMVVM.Windows</Name>
