@@ -40,6 +40,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.VisualStudio.TestPlatform.TestFramework, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\..\packages\MSTest.TestFramework.1.3.2\lib\net45\Microsoft.VisualStudio.TestPlatform.TestFramework.dll</HintPath>
     </Reference>
@@ -51,15 +57,18 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="UnitTests\CustomerViewModelTests.cs" />
-    <Compile Include="ObservableObjectTest.cs" />
+    <Compile Include="UnitTests\MainViewModelTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ViewModelTest.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Code\EnterpriseMVVM.Data\EnterpriseMVVM.Data.csproj">
+      <Project>{89d0f528-fbee-4cf5-9855-8a69b31a1a25}</Project>
+      <Name>EnterpriseMVVM.Data</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Code\EnterpriseMVVM.DesktopClient\EnterpriseMVVM.DesktopClient.csproj">
       <Project>{1f97cc20-be97-4cb5-a1cd-25e5d6e568c6}</Project>
       <Name>EnterpriseMVVM.DesktopClient</Name>
@@ -67,6 +76,10 @@
     <ProjectReference Include="..\..\Code\EnterpriseMVVM.Windows\EnterpriseMVVM.Windows.csproj">
       <Project>{d06c402d-2889-43de-a357-e0378b451763}</Project>
       <Name>EnterpriseMVVM.Windows</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\EnterpriseMVVM.Data.Tests\EnterpriseMVVM.Data.Tests.csproj">
+      <Project>{a98f1872-3cd9-4c39-bbb8-325b6db23957}</Project>
+      <Name>EnterpriseMVVM.Data.Tests</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />

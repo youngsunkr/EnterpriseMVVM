@@ -21,7 +21,7 @@ namespace EnterpriseMVVM.DesktopClient
 
             MainWindow window = new MainWindow
             {
-                DataContext = new CustomerViewModel()
+                DataContext = new MainViewModel()
             };
 
             window.ShowDialog();

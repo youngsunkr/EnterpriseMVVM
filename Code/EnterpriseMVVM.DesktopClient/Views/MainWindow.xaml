@@ -5,10 +5,59 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:EnterpriseMVVM.DesktopClient"
         xmlns:viewModels="clr-namespace:EnterpriseMVVM.DesktopClient.ViewModels"
+        xmlns:data="clr-namespace:EnterpriseMVVM.Data;assembly=EnterpriseMVVM.Data"
+        xmlns:windows="clr-namespace:EnterpriseMVVM.Windows;assembly=EnterpriseMVVM.Windows"
         mc:Ignorable="d"
-        d:DataContext="{d:DesignInstance viewModels:CustomerViewModel}"
+        d:DataContext="{d:DesignInstance viewModels:MainViewModel}"
         Title="MainWindow" Height="350" Width="525">
-    <Grid>
-        <TextBox Margin="30" Text="{Binding CustomerName, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}"/>
-    </Grid>
+
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="VisibilityConverter"/>
+        <Style TargetType="Label">
+            <Setter Property="Padding" Value="0"/>
+        </Style>
+    </Window.Resources>
+    
+    <DockPanel Margin="30">
+        <DockPanel DockPanel.Dock="Left" Width="200" Margin="0,0,32,0">
+            <TextBlock DockPanel.Dock="Top">
+                <Hyperlink Command="{Binding AddCommand}">Add Customer</Hyperlink>
+                <Hyperlink Command="{Binding GetCustomerListCommand}">Refresh</Hyperlink>
+            </TextBlock>  
+            <ListBox ItemsSource="{Binding Customers}" SelectedIndex="{Binding SelectedCustomer}">
+                <ListBox.Resources>
+                    <DataTemplate DataType="{x:Type data:Customer}">
+                        <TextBlock>
+                            <Run FontWeight="Bold">First Name:</Run>
+                            <Run Text="{Binding FirstName}"/>
+                            <Run FontWeight="Bold">Last Name:</Run>
+                            <Run Text="{Binding LastName}"/>
+                            <Run FontWeight="Bold">Email:</Run>
+                            <Run Text="{Binding Email}"/>
+                        </TextBlock>
+                    </DataTemplate>
+                </ListBox.Resources>
+            </ListBox>
+        </DockPanel>
+        
+        <StackPanel DockPanel.Dock="Right" Visibility="{Binding HasCustomer, Converter={StaticResource VisibilityConverter}}">
+            <Label>First Name</Label>
+            <TextBox Text="{Binding SelectedCustomer.FirstName, 
+                            ValidatesOnDataErrors=True, 
+                            UpdateSourceTrigger=PropertyChanged}"/>
+            <Label>Last Name</Label>
+            <TextBox Text="{Binding SelectedCustomer.LastName, 
+                            ValidatesOnDataErrors=True, 
+                            UpdateSourceTrigger=PropertyChanged}"/>
+            <Label>Email</Label>
+            <TextBox Text="{Binding SelectedCustomer.Email, 
+                                        ValidatesOnDataErrors=True, 
+                                        UpdateSourceTrigger=PropertyChanged}"/>
+            <TextBlock>
+                <Hyperlink Command="{Binding SelectedCustomer}">Save</Hyperlink>
+                <Hyperlink Command="{Binding DeleteCCustomerommand}">Delete</Hyperlink>
+            </TextBlock>  
+        </StackPanel>        
+        
+    </DockPanel>
 </Window>

@@ -8,15 +8,37 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace EnterpriseMVVM.Data.Tests.UnitTests
 {
     [TestClass]
-    public class BusinessContextTests
+    public class BusinessContextTests : FunctionalTest
     {
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
+        public void AddNewCustomer_ThrowException_WhenEmailNameIsEmpty()
+        {
+            using (var bc = new BusinessContext())
+            {
+                var customer = new Customer
+                {
+                    Email = "",
+                    FirstName = "David",
+                    LastName = "Anderson"
+                };
+                bc.AddNewCustomer(customer);
+            }
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
         public void AddNewCustomer_ThrowException_WhenFirstNameIsNull()
         {
             using (var bc = new BusinessContext())
             {
-                bc.AddNewCustomer(null, "Anderson");
+                var customer = new Customer
+                {
+                    Email = "customer@northwind.com",
+                    FirstName = null,
+                    LastName = "Anderson"
+                };
+                bc.AddNewCustomer(customer);
             }
         }
 
@@ -26,9 +48,46 @@ namespace EnterpriseMVVM.Data.Tests.UnitTests
         {
             using (var bc = new BusinessContext())
             {
-                bc.AddNewCustomer("", "Anderson");
+                var customer = new Customer
+                {
+                    Email = "customer@northwind.com",
+                    FirstName = "",
+                    LastName = "Anderson"
+                };
+                bc.AddNewCustomer(customer);
             }
         }
 
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void AddNewCustomer_ThrowException_WhenLastNameIsNull()
+        {
+            using (var bc = new BusinessContext())
+            {
+                var customer = new Customer
+                {
+                    Email = "customer@northwind.com",
+                    FirstName = "David",
+                    LastName = null
+                };
+                bc.AddNewCustomer(customer);
+            }
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void AddNewCustomer_ThrowException_WhenLastNameEmpty()
+        {
+            using (var bc = new BusinessContext())
+            {
+                var customer = new Customer
+                {
+                    Email = "customer@northwind.com",
+                    FirstName = "David",
+                    LastName = ""
+                };
+                bc.AddNewCustomer(customer);
+            }
+        }
     }
 }

@@ -65,7 +65,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="ViewModels\CustomerViewModel.cs" />
+    <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="Views\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -97,9 +97,8 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
-    <ProjectReference Include="..\..\EnterpriseMVVM.Data\EnterpriseMVVM.Data.csproj">
+    <ProjectReference Include="..\EnterpriseMVVM.Data\EnterpriseMVVM.Data.csproj">
       <Project>{89d0f528-fbee-4cf5-9855-8a69b31a1a25}</Project>
       <Name>EnterpriseMVVM.Data</Name>
     </ProjectReference>

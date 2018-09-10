@@ -28,10 +28,17 @@ namespace EnterpriseMVVM.Windows
                 MemberName = propertyName
             };
 
-            var result = new Collection<ValidationResult>();
-            var isValid = Validator.TryValidateObject(this, context, result, true);
+            var results = new Collection<ValidationResult>();
+            var isValid = Validator.TryValidateObject(this, context, results, true);
 
-            return !isValid ? result[0].ErrorMessage : null;
+            if (!isValid)
+            {
+                ValidationResult result = results.SingleOrDefault(p => p.MemberNames.Any(memberName => memberName == propertyName));
+
+                return result == null ? null : result.ErrorMessage;
+            }
+
+            return null;
         }
     }
 }
