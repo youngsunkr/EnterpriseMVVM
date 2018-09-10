@@ -13,16 +13,11 @@ namespace EnterpriseMVVM.DesktopClient.ViewModels
 {
     public class MainViewModel : ViewModel
     {
-        private BusinessContext context;
+        private IBusinessContext context;
         private string customerName;
         private Customer selectedCustomer;
 
-        public MainViewModel() : this(new BusinessContext())
-        {
-
-        }
-
-        public MainViewModel(BusinessContext context)
+        public MainViewModel(IBusinessContext context)
         {
             Customers = new ObservableCollection<Customer>();
             this.context = context;
@@ -91,7 +86,7 @@ namespace EnterpriseMVVM.DesktopClient.ViewModels
             }
         }
 
-        public ICommand DeleteCustomerCommand
+        public ICommand DeleteCommand
         {
             get
             {
@@ -99,7 +94,7 @@ namespace EnterpriseMVVM.DesktopClient.ViewModels
             }
         }
 
-        public ICommand SaveCustomerCommand
+        public ICommand UpdateCommand
         {
             get
             {
@@ -110,27 +105,24 @@ namespace EnterpriseMVVM.DesktopClient.ViewModels
 
         public void AddCustomer()
         {
-            using (var api = new BusinessContext())
+            var customer = new Customer
             {
-                var customer = new Customer
-                {
-                    FirstName = "New",
-                    LastName = "Customer",
-                    Email = "new@customer.com"
-                };
-            
-                try
-                {
-                    api.AddNewCustomer(customer);
-                }
-                catch (Exception ex)
-                {
-                    // TODO: In later session, cover error handling
-                    return;
-                }
-            
-                Customers.Add(customer);
+                FirstName = "New",
+                LastName = "Customer",
+                Email = "new@customer.com"
+            };
+        
+            try
+            {
+                context.CreateCustomer(customer);
             }
+            catch (Exception ex)
+            {
+                // TODO: In later session, cover error handling
+                return;
+            }
+        
+            Customers.Add(customer);
         }
 
 
@@ -151,8 +143,7 @@ namespace EnterpriseMVVM.DesktopClient.ViewModels
         }
         private void DeleteCustomer()
         {
-            context.DataContext.Customers.Remove(SelectedCustomer);
-            context.DataContext.SaveChanges();
+            context.DeleteCustomer(SelectedCustomer);
             Customers.Remove(SelectedCustomer);
             SelectedCustomer = null;
         }

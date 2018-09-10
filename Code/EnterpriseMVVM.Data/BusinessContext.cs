@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace EnterpriseMVVM.Data
 {
-    public sealed class BusinessContext : IDisposable
+    public sealed class BusinessContext : IDisposable, IBusinessContext
     {
         private readonly DataContext context;
         private bool disposed;
@@ -21,13 +21,19 @@ namespace EnterpriseMVVM.Data
             get { return context; }
         }
 
-        public void AddNewCustomer(Customer customer)
+        public void CreateCustomer(Customer customer)
         {
             Check.Require(customer.Email);
             Check.Require(customer.FirstName);
             Check.Require(customer.LastName);
            
             context.Customers.Add(customer);
+            context.SaveChanges();
+        }
+
+        public void DeleteCustomer(Customer customer)
+        {
+            context.Customers.Remove(customer);
             context.SaveChanges();
         }
 

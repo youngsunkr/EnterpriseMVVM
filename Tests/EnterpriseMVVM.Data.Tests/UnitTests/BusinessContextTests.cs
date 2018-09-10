@@ -22,7 +22,7 @@ namespace EnterpriseMVVM.Data.Tests.UnitTests
                     FirstName = "David",
                     LastName = "Anderson"
                 };
-                bc.AddNewCustomer(customer);
+                bc.CreateCustomer(customer);
             }
         }
 
@@ -38,7 +38,7 @@ namespace EnterpriseMVVM.Data.Tests.UnitTests
                     FirstName = null,
                     LastName = "Anderson"
                 };
-                bc.AddNewCustomer(customer);
+                bc.CreateCustomer(customer);
             }
         }
 
@@ -54,7 +54,7 @@ namespace EnterpriseMVVM.Data.Tests.UnitTests
                     FirstName = "",
                     LastName = "Anderson"
                 };
-                bc.AddNewCustomer(customer);
+                bc.CreateCustomer(customer);
             }
         }
 
@@ -70,7 +70,7 @@ namespace EnterpriseMVVM.Data.Tests.UnitTests
                     FirstName = "David",
                     LastName = null
                 };
-                bc.AddNewCustomer(customer);
+                bc.CreateCustomer(customer);
             }
         }
 
@@ -86,7 +86,7 @@ namespace EnterpriseMVVM.Data.Tests.UnitTests
                     FirstName = "David",
                     LastName = ""
                 };
-                bc.AddNewCustomer(customer);
+                bc.CreateCustomer(customer);
             }
         }
     }

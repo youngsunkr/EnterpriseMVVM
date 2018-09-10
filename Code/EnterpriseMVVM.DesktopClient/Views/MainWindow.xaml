@@ -55,8 +55,8 @@
                             ValidatesOnDataErrors=True, 
                             UpdateSourceTrigger=PropertyChanged}"/>
             <TextBlock>
-                <Hyperlink Command="{Binding SaveCustomerCommand}">Save</Hyperlink>
-                <Hyperlink Command="{Binding DeleteCustomerCommand}">Delete</Hyperlink>
+                <Hyperlink Command="{Binding UpdateCommand}">Save</Hyperlink>
+                <Hyperlink Command="{Binding DeleteCommand}">Delete</Hyperlink>
             </TextBlock>  
         </StackPanel>        
         

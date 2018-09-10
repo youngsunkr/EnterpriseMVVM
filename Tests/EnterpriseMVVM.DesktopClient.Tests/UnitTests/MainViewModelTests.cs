@@ -9,12 +9,35 @@ using System.Data.Entity;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Moq;
 
 namespace EnterpriseMVVM.DesktopClient.Tests
 {
     [TestClass]
-    public class MainViewModelTests : FunctionalTest
+    public class MainViewModelTests
     {
+        private Mock<IBusinessContext> mock;
+        private List<Customer> store;
+
+        [TestInitialize]
+        public void TestInitialize()
+        {
+            store = new List<Customer>();
+
+            mock = new Mock<IBusinessContext>();
+            mock.Setup(m => m.GetCustomerList()).Returns(store);
+            mock.Setup(m => m.CreateCustomer(It.IsAny<Customer>())).Callback<Customer>(customer => store.Add(customer));
+            mock.Setup(m => m.DeleteCustomer(It.IsAny<Customer>())).Callback<Customer>(customer => store.Remove(customer));
+            mock.Setup(m => m.UpdateCustomer(It.IsAny<Customer>())).Callback<Customer>(customer =>
+                                                                                                {
+                                                                                                    int i = store.IndexOf(customer);
+                                                                                                    store[i] = customer;
+                                                                                                });
+
+        }
+
+
+
         [TestMethod]
         public void IsViewModel()
         {
@@ -24,7 +47,7 @@ namespace EnterpriseMVVM.DesktopClient.Tests
         [TestMethod]
         public void ValidationErrorWhenCustomerNameIsNotGreaterThanOrEqualTo32Characters()
         {
-            var viewModel = new MainViewModel
+            var viewModel = new MainViewModel(mock.Object)
             {
                 CustomerName = "B"
             };
@@ -35,7 +58,7 @@ namespace EnterpriseMVVM.DesktopClient.Tests
         [TestMethod]
         public void NoValidationErrorWhenCustomerNameMeetsAllRequiremenets()
         {
-            var viewModel = new MainViewModel
+            var viewModel = new MainViewModel(mock.Object)
             {
                 CustomerName = "David Anderson"
             };
@@ -47,7 +70,7 @@ namespace EnterpriseMVVM.DesktopClient.Tests
         [TestMethod]
         public void ValidationErrorWhenCustomerNameIsNotProvided()
         {
-            var viewModel = new MainViewModel
+            var viewModel = new MainViewModel(mock.Object)
             {
                 CustomerName = null
             };
@@ -59,7 +82,7 @@ namespace EnterpriseMVVM.DesktopClient.Tests
         [TestMethod]
         public void AddCustomerCommandCannotExecuteWhenFirstNameIsNotValid()
         {
-            var viewModel = new MainViewModel
+            var viewModel = new MainViewModel(mock.Object)
             {
                 SelectedCustomer = new Customer()
                 {
@@ -75,7 +98,7 @@ namespace EnterpriseMVVM.DesktopClient.Tests
         [TestMethod]
         public void AddCustomerCommandCannotExecuteWhenLastNameIsNotValid()
         {
-            var viewModel = new MainViewModel
+            var viewModel = new MainViewModel(mock.Object)
             {
                 SelectedCustomer = new Customer()
                 {
@@ -91,7 +114,7 @@ namespace EnterpriseMVVM.DesktopClient.Tests
         [TestMethod]
         public void AddCustomerCommandCannotExecuteWhenEmailIsNotValid()
         {
-            var viewModel = new MainViewModel
+            var viewModel = new MainViewModel(mock.Object)
             {
                 SelectedCustomer = new Customer()
                 {
@@ -107,11 +130,14 @@ namespace EnterpriseMVVM.DesktopClient.Tests
         [TestMethod]
         public void AddCustomerCommandAddsCustomerToCustomersCollectionWhenExecutedSuccessfully()
         {
-            var viewModel = new MainViewModel
+            var viewModel = new MainViewModel(mock.Object)
             {
-                FirstName = "David",
-                LastName = "Anderson",
-                Email = "noreply@northwind.com"
+                SelectedCustomer = new Customer()
+                {
+                    FirstName = "David",
+                    LastName = "Anderson",
+                    Email = "noreply@northwind.com"
+                }
             };
 
             viewModel.AddCommand.Execute(null);
@@ -120,21 +146,69 @@ namespace EnterpriseMVVM.DesktopClient.Tests
         }
 
         [TestMethod]
+        public void CanModify_ShouldEqualFalseWhenSelectedCustomerIsNull()
+        {
+            var viewModel = new MainViewModel(mock.Object) { SelectedCustomer = null };
+            Assert.IsFalse(viewModel.CanModify);
+        }
+
+        [TestMethod]
+        public void CanModify_ShouldEqualTrueWhenSelectedCustomerIsNotNull()
+        {
+            var viewModel = new MainViewModel(mock.Object) { SelectedCustomer = new Customer() };
+            Assert.IsTrue(viewModel.CanModify);
+        }
+
+        [TestMethod]
         public void GetCustomerListCommandPopulatesCustomersProperty()
         {
-            using (var context = new BusinessContext())
+            mock.Object.CreateCustomer(new Customer { FirstName = "1@1.com", LastName = "1", Email = "A" });
+            mock.Object.CreateCustomer(new Customer { FirstName = "2@2.com", LastName = "2", Email = "B" });
+            mock.Object.CreateCustomer(new Customer { FirstName = "3@3.com", LastName = "3", Email = "C" });
+
+            var viewModel = new MainViewModel(mock.Object);
+
+            viewModel.GetCustomerListCommand.Execute(null);
+
+            Assert.IsTrue(viewModel.Customers.Count == 3);
+
+        }
+
+        [TestMethod]
+        public void GetCustomerListCommand_SelectedCustomerIsSetToNullWhenExecuted()
+        {
+            var viewModel = new MainViewModel(mock.Object)
             {
-                context.AddNewCustomer(new Customer { FirstName = "1@1.com", LastName = "1", Email = "A" });
-                context.AddNewCustomer(new Customer { FirstName = "2@2.com", LastName = "2", Email = "B" });
-                context.AddNewCustomer(new Customer { FirstName = "3@3.com", LastName = "3", Email = "C" });
+                SelectedCustomer = new Customer
+                {
+                    Id = 1,
+                    FirstName = "David",
+                    LastName = "Anderson",
+                    Email = "noreply@northwind.com"
+                }
+            };
 
-                var viewModel = new MainViewModel(context);
+            viewModel.AddCommand.Execute(null);
 
-                viewModel.GetCustomerListCommand.Execute(null);
+            Assert.IsTrue(viewModel.Customers.Count == 1);
+        }
 
-                Assert.IsTrue(viewModel.Customers.Count == 3);
-            }
+        [TestMethod]
+        public void SaveCommand_InvokesIBusinessContextUpdateCustomerMethod()
+        {
+            // Arrange
+            mock.Object.CreateCustomer(new Customer { Email = "1@1.com", FirstName = "1", LastName = "A" });
 
+            var viewModel = new MainViewModel(mock.Object);
+
+            viewModel.GetCustomerListCommand.Execute(null);
+            viewModel.SelectedCustomer = viewModel.Customers.First();
+
+            // Act
+            viewModel.UpdateCommand.Execute(null);
+
+            // Assert
+            mock.Verify(m => m.UpdateCustomer(It.IsAny<Customer>()), Times.Once);
         }
 
         [TestMethod]
@@ -143,7 +217,7 @@ namespace EnterpriseMVVM.DesktopClient.Tests
             using (var context = new BusinessContext())
             {
                 // Arrange
-                context.AddNewCustomer(new Customer { Email = "1@1.com", FirstName = "1", LastName = "A" });
+                context.CreateCustomer(new Customer { Email = "1@1.com", FirstName = "1", LastName = "A" });
 
                 var viewModel = new MainViewModel(context);
 
@@ -152,7 +226,7 @@ namespace EnterpriseMVVM.DesktopClient.Tests
 
                 // Act
                 viewModel.SelectedCustomer.FirstName = "newValue";
-                viewModel.SaveCustomerCommand.Execute(null);
+                viewModel.UpdateCommand.Execute(null);
 
                 // Assert
                 var customer = context.DataContext.Customers.Single();
@@ -162,25 +236,75 @@ namespace EnterpriseMVVM.DesktopClient.Tests
         }
 
         [TestMethod]
-        public void DeleteCommand_DeletesCustomerFromContext()
+        public void DeleteCommand_InvokesIBusinessContextDeleteCustomerMethod()
         {
-            using (var context = new BusinessContext())
-            {
-                // Arrange
-                context.AddNewCustomer(new Customer { Email = "1@1.com", FirstName = "1", LastName = "A" });
+            // Arrange
+            mock.Object.CreateCustomer(new Customer { Email = "1@1.com", FirstName = "1", LastName = "A" });
 
-                var viewModel = new MainViewModel(context);
+            var viewModel = new MainViewModel(mock.Object);
 
-                viewModel.GetCustomerListCommand.Execute(null);
-                viewModel.SelectedCustomer = viewModel.Customers.First();
+            viewModel.GetCustomerListCommand.Execute(null);
+            viewModel.SelectedCustomer = viewModel.Customers.First();
 
-                // Act
-                viewModel.DeleteCustomerCommand.Execute(null);
+            // Act
+            viewModel.DeleteCommand.Execute(null);
 
-                // Assert
-                Assert.IsFalse(context.DataContext.Customers.Any());
-            }
+            // Assert
+            mock.Verify(m => m.DeleteCustomer(It.IsAny<Customer>()), Times.Once);
         }
 
+        [TestMethod]
+        public void DeleteCommand_SelectedCustomerIsSetToNull()
+        {
+            // Arrange
+            mock.Object.CreateCustomer(new Customer { Email = "1@1.com", FirstName = "1", LastName = "A" });
+
+            var viewModel = new MainViewModel(mock.Object);
+
+            viewModel.GetCustomerListCommand.Execute(null);
+            viewModel.SelectedCustomer = viewModel.Customers.First();
+
+            // Act
+            viewModel.DeleteCommand.Execute(null);
+
+            // Assert
+            Assert.IsNull(viewModel.SelectedCustomer);
+        }
+
+        [TestMethod]
+        public void PropertyChanged_IsRaisedForCanModifyWhenSelectedCustomerPropertyHasChanged()
+        {
+            var viewModel = new MainViewModel(mock.Object);
+
+            bool eventRaised = false;
+
+            viewModel.PropertyChanged += (sender, e) =>
+                                         {
+                                             if (e.PropertyName == "CanModify")
+                                                 eventRaised = true;
+                                         };
+
+            viewModel.SelectedCustomer = null;
+
+            Assert.IsTrue(eventRaised);
+        }
+
+        [TestMethod]
+        public void PropertyChanged_IsRaisedForSelectedCustomerWhenSelectedCustomerPropertyHasChanged()
+        {
+            var viewModel = new MainViewModel(mock.Object);
+
+            bool eventRaised = false;
+
+            viewModel.PropertyChanged += (sender, e) =>
+                                         {
+                                             if (e.PropertyName == "SelectedCustomer")
+                                                 eventRaised = true;
+                                         };
+
+            viewModel.SelectedCustomer = null;
+
+            Assert.IsTrue(eventRaised);
+        }
     }
 }

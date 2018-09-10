@@ -21,7 +21,7 @@ namespace EnterpriseMVVM.Data.Tests.UnitTests
                     FirstName = "David",
                     LastName = "Anderson"
                 };
-                bc.AddNewCustomer(customer);
+                bc.CreateCustomer(customer);
 
                 bool exists = bc.DataContext.Customers.Any(c => c.Id == customer.Id);
 
@@ -43,7 +43,7 @@ namespace EnterpriseMVVM.Data.Tests.UnitTests
                     LastName = "Anderson"
                 };
 
-                bc.AddNewCustomer(customer);
+                bc.CreateCustomer(customer);
                 
                 const string newEmail = "new_customer@northwind.com",
                              newFirstName = "Youngsun",
@@ -70,15 +70,27 @@ namespace EnterpriseMVVM.Data.Tests.UnitTests
         {
             using (var bc = new BusinessContext())
             {
-                bc.AddNewCustomer(new Customer { Email = "1@1.com", FirstName = "1", LastName = "a" });
-                bc.AddNewCustomer(new Customer { Email = "2@2.com", FirstName = "2", LastName = "b" });
-                bc.AddNewCustomer(new Customer { Email = "3@3.com", FirstName = "3", LastName = "c" });
+                bc.CreateCustomer(new Customer { Email = "1@1.com", FirstName = "1", LastName = "a" });
+                bc.CreateCustomer(new Customer { Email = "2@2.com", FirstName = "2", LastName = "b" });
+                bc.CreateCustomer(new Customer { Email = "3@3.com", FirstName = "3", LastName = "c" });
 
                 var customers = bc.GetCustomerList();
 
                 Assert.IsTrue(customers.ElementAt(0).Id == 1);
                 Assert.IsTrue(customers.ElementAt(1).Id == 2);
                 Assert.IsTrue(customers.ElementAt(2).Id == 3);
+            }
+        }
+
+        [TestMethod]
+        public void DeleteCustomer_RemovesCustomerFirstDataStore()
+        {
+            using (var bc = new BusinessContext())
+            {
+                var customer = new Customer {Email = "1@1.com", FirstName = "1", LastName = "a"};
+                bc.CreateCustomer(customer);
+                bc.DeleteCustomer(customer);
+                Assert.IsFalse(bc.DataContext.Customers.Any());
             }
         }
     }
