@@ -24,23 +24,24 @@
                 <Hyperlink Command="{Binding AddCommand}">Add Customer</Hyperlink>
                 <Hyperlink Command="{Binding GetCustomerListCommand}">Refresh</Hyperlink>
             </TextBlock>  
-            <ListBox ItemsSource="{Binding Customers}" SelectedIndex="{Binding SelectedCustomer}">
+            <ListBox ItemsSource="{Binding Customers}" SelectedItem="{Binding SelectedCustomer}">
                 <ListBox.Resources>
                     <DataTemplate DataType="{x:Type data:Customer}">
                         <TextBlock>
-                            <Run FontWeight="Bold">First Name:</Run>
-                            <Run Text="{Binding FirstName}"/>
-                            <Run FontWeight="Bold">Last Name:</Run>
-                            <Run Text="{Binding LastName}"/>
-                            <Run FontWeight="Bold">Email:</Run>
-                            <Run Text="{Binding Email}"/>
+                            <TextBlock.Text>
+                                <MultiBinding StringFormat="{}{0} {1} ({2})">
+                                    <Binding Path="FirstName"/>
+                                    <Binding Path="LastName"/>
+                                    <Binding Path="Email"/>
+                                </MultiBinding>
+                            </TextBlock.Text>
                         </TextBlock>
                     </DataTemplate>
                 </ListBox.Resources>
             </ListBox>
         </DockPanel>
         
-        <StackPanel DockPanel.Dock="Right" Visibility="{Binding HasCustomer, Converter={StaticResource VisibilityConverter}}">
+        <StackPanel DockPanel.Dock="Right" Visibility="{Binding CanModify, Converter={StaticResource VisibilityConverter}}">
             <Label>First Name</Label>
             <TextBox Text="{Binding SelectedCustomer.FirstName, 
                             ValidatesOnDataErrors=True, 
@@ -51,11 +52,11 @@
                             UpdateSourceTrigger=PropertyChanged}"/>
             <Label>Email</Label>
             <TextBox Text="{Binding SelectedCustomer.Email, 
-                                        ValidatesOnDataErrors=True, 
-                                        UpdateSourceTrigger=PropertyChanged}"/>
+                            ValidatesOnDataErrors=True, 
+                            UpdateSourceTrigger=PropertyChanged}"/>
             <TextBlock>
-                <Hyperlink Command="{Binding SelectedCustomer}">Save</Hyperlink>
-                <Hyperlink Command="{Binding DeleteCCustomerommand}">Delete</Hyperlink>
+                <Hyperlink Command="{Binding SaveCustomerCommand}">Save</Hyperlink>
+                <Hyperlink Command="{Binding DeleteCustomerCommand}">Delete</Hyperlink>
             </TextBlock>  
         </StackPanel>        
         

@@ -5,6 +5,7 @@ using EnterpriseMVVM.Windows;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -157,6 +158,27 @@ namespace EnterpriseMVVM.DesktopClient.Tests
                 var customer = context.DataContext.Customers.Single();
                 context.DataContext.Entry(customer).Reload();
                 Assert.AreEqual(viewModel.SelectedCustomer.FirstName, customer.FirstName);
+            }
+        }
+
+        [TestMethod]
+        public void DeleteCommand_DeletesCustomerFromContext()
+        {
+            using (var context = new BusinessContext())
+            {
+                // Arrange
+                context.AddNewCustomer(new Customer { Email = "1@1.com", FirstName = "1", LastName = "A" });
+
+                var viewModel = new MainViewModel(context);
+
+                viewModel.GetCustomerListCommand.Execute(null);
+                viewModel.SelectedCustomer = viewModel.Customers.First();
+
+                // Act
+                viewModel.DeleteCustomerCommand.Execute(null);
+
+                // Assert
+                Assert.IsFalse(context.DataContext.Customers.Any());
             }
         }
 

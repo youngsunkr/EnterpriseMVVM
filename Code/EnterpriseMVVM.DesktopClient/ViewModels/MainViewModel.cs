@@ -28,6 +28,14 @@ namespace EnterpriseMVVM.DesktopClient.ViewModels
             this.context = context;
         }
 
+        public bool CanModify
+        {
+            get
+            {
+                return SelectedCustomer != null;
+            }
+        }
+
         [Required]
         [StringLength(32, MinimumLength = 2)]
         public string CustomerName
@@ -60,6 +68,7 @@ namespace EnterpriseMVVM.DesktopClient.ViewModels
             {
                 selectedCustomer = value;
                 NotifyPropertyChanged();
+                NotifyPropertyChanged("CanModify");
             }
         }
 
@@ -82,7 +91,15 @@ namespace EnterpriseMVVM.DesktopClient.ViewModels
             }
         }
 
-        public ActionCommand SaveCustomerCommand
+        public ICommand DeleteCustomerCommand
+        {
+            get
+            {
+                return new ActionCommand(p => DeleteCustomer());
+            }
+        }
+
+        public ICommand SaveCustomerCommand
         {
             get
             {
@@ -131,6 +148,13 @@ namespace EnterpriseMVVM.DesktopClient.ViewModels
         private void SaveCustomer()
         {
             context.UpdateCustomer(SelectedCustomer);
+        }
+        private void DeleteCustomer()
+        {
+            context.DataContext.Customers.Remove(SelectedCustomer);
+            context.DataContext.SaveChanges();
+            Customers.Remove(SelectedCustomer);
+            SelectedCustomer = null;
         }
     }
 }
